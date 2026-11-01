@@ -1,0 +1,21 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  repo-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Docs and compose sanity checks
+        run: make check
+
+  # Added later:
+  #   ingest-tests      (Day 2)  pytest + testcontainers
+  #   agent-build-test  (Day 6)  CMake + GoogleTest
+  #   agent-asan-ubsan  (Day 6)  AddressSanitizer + UndefinedBehaviorSanitizer
+  #   agent-tsan        (Day 6)  ThreadSanitizer
+  #   chaos-fixed-seed  (Day 13) end-to-end failure scenarios
