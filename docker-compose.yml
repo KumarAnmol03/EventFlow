@@ -17,8 +17,23 @@ services:
       timeout: 3s
       retries: 15
 
+  ingest:
+    build: ./ingest
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-eventflow}:${POSTGRES_PASSWORD:-eventflow-dev}@postgres:5432/${POSTGRES_DB:-eventflow}
+      INGEST_AGENT_TOKENS: ${INGEST_AGENT_TOKENS:-edge-01:dev-token-edge-01}
+    ports:
+      - "${INGEST_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy   # start only after Postgres accepts connections
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/readyz')"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
   # Added later, on the day each one is built:
-  #   ingest    (Day 2)  Python service, depends_on postgres: service_healthy
   #   agent     (Day 13) C++ edge agent
   #   toxiproxy (Day 15) network fault injection, test profile only
 

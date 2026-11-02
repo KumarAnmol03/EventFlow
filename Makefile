@@ -7,7 +7,7 @@ REQUIRED_DOCS := docs/contracts.md docs/failure-model.md \
 	docs/adr/ADR-002-event-identity.md \
 	docs/adr/ADR-003-delivery-guarantee.md
 
-.PHONY: help env up down clean logs psql check test
+.PHONY: help env up down clean logs psql check test lint
 
 help: ## List available commands
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  %-8s %s\n", $$1, $$2}'
@@ -37,4 +37,7 @@ check: ## Repo sanity checks (run by CI)
 	 else echo "compose: skipped (docker not installed)"; fi
 
 test: ## Run all test suites that exist so far
-	@echo "no test suites yet (ingest tests arrive on Day 2)"
+	cd ingest && uv run pytest -q
+
+lint: ## Lint and format-check the Python code
+	cd ingest && uv run ruff check . && uv run ruff format --check .
